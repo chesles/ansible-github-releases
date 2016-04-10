@@ -20,6 +20,7 @@ def main():
             repo=dict(required=True),
             token=dict(required=True),
             prefix=dict(required=False, default=''),
+            latest=dict(required=False, default=False),
         ),
         supports_check_mode=True
     )
@@ -28,6 +29,7 @@ def main():
     owner = module.params['owner']
     repo = module.params['repo']
     prefix = module.params['prefix']
+    latest = module.params['latest']
 
     if module.check_mode:
         releases = []
@@ -39,6 +41,10 @@ def main():
 
     if prefix:
         releases = [r for r in releases if r['name'].startswith(prefix)]
+
+    if latest:
+        releases.sort(key=lambda r: r['created_at'])
+        releases = releases[-1]
 
     module.exit_json(results=releases)
 
